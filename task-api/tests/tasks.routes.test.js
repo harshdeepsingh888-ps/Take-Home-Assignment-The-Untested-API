@@ -258,6 +258,17 @@ describe('Task API Integration Tests', () => {
       expect(resEmpty.body.error).toMatch(/assignee is required/);
     });
 
+    it('should return 400 if assignee is not a string', async () => {
+      const task = taskService.create({ title: 'Task for Assignee' });
+
+      const res = await request(app)
+        .patch(`/tasks/${task.id}/assign`)
+        .send({ assignee: 12345 });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/assignee is required/);
+    });
+
     it('should return 404 for non-existent task ID', async () => {
       const res = await request(app)
         .patch('/tasks/non-existent-id/assign')
@@ -266,32 +277,5 @@ describe('Task API Integration Tests', () => {
       expect(res.status).toBe(404);
       expect(res.body.error).toBe('Task not found');
     });
-it('should return 400 if assignee is not a string', async () => {
-  const task = taskService.create({ title: 'Task for Assignee' });
-
-  const res = await request(app)
-    .patch(`/tasks/${task.id}/assign`)
-    .send({ assignee: 123 });
-
-  expect(res.status).toBe(400);
-  expect(res.body.error).toMatch(/assignee is required/);
-});
-it('should allow reassignment of an existing task', async () => {
-  const task = taskService.create({ title: 'Reassignable Task' });
-
-  const firstAssignment = await request(app)
-    .patch(`/tasks/${task.id}/assign`)
-    .send({ assignee: 'Alice' });
-
-  expect(firstAssignment.status).toBe(200);
-  expect(firstAssignment.body.assignee).toBe('Alice');
-
-  const reassignment = await request(app)
-    .patch(`/tasks/${task.id}/assign`)
-    .send({ assignee: 'Bob' });
-
-  expect(reassignment.status).toBe(200);
-  expect(reassignment.body.assignee).toBe('Bob');
-});
   });
 });

@@ -205,6 +205,14 @@ describe('taskService Unit Tests', () => {
       expect(taskService.findById(task.id).assignee).toBe('John Doe');
     });
 
+    it('should overwrite an existing assignee when re-assigning a task', () => {
+      const task = taskService.create({ title: 'Task to Reassign' });
+      taskService.assignTask(task.id, 'Alice');
+      const reassigned = taskService.assignTask(task.id, 'Bob');
+
+      expect(reassigned.assignee).toBe('Bob');
+    });
+
     it('should return null when assigning a non-existent task', () => {
       const result = taskService.assignTask('non-existent-id', 'John Doe');
       expect(result).toBeNull();
